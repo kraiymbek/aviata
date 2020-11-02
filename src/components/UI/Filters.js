@@ -125,9 +125,22 @@ export default function Filters({ airlines, onFilter }) {
   });
   const [airlineCheckboxes, setAirlineCheckboxes] = useState({});
   const [allNameCheckbox, setAllNameCheckbox] = useState(false);
+  const [isResetStateAllowed, setIsResetStateAllowed] = useState({
+    airlines: false,
+    tariffs: false,
+  });
 
   useEffect(() => {
     onFilter({ ...tariffFilter });
+
+    const data = [];
+    for (let key in tariffFilter) {
+      if (tariffFilter[key]) {
+        data.push(key);
+      }
+    }
+
+    setIsResetStateAllowed({ ...isResetStateAllowed, tariffs: !!data.length });
   }, [tariffFilter]);
 
   useEffect(() => {
@@ -144,6 +157,8 @@ export default function Filters({ airlines, onFilter }) {
     } else {
       data = selectedCheckboxes;
     }
+
+    setIsResetStateAllowed({ ...isResetStateAllowed, airlines: data === 'all' || !!data.length });
 
     onFilter({ ...tariffFilter, airlines: data });
   }, [airlineCheckboxes, allNameCheckbox]);
@@ -202,6 +217,7 @@ export default function Filters({ airlines, onFilter }) {
       setAirlineCheckboxes(filtersToReset.airlines);
       setTariffFilter(filtersToReset.tariffs);
     } else if (type === 'airlines') {
+      setAllNameCheckbox(false);
       setAirlineCheckboxes(filtersToReset.airlines);
     } else if (type === 'tariffs') {
       setTariffFilter(filtersToReset.tariffs);
@@ -213,11 +229,16 @@ export default function Filters({ airlines, onFilter }) {
       <Box className={classes.tariffFilter}>
         <Box className={classes.header}>
           <Box className={classes.headerText}>Опции тарифа</Box>
-          <BootstrapTooltip arrow title="Сбросить выбор" placement="top">
-            <Box className={classes.resetBtn} onClick={() => handleResets('tariffs')}>
-              <FastIcon className={classes.resetIcon} iconName="reset" />
-            </Box>
-          </BootstrapTooltip>
+          {isResetStateAllowed.tariffs && (
+            <BootstrapTooltip arrow title="Сбросить выбор" placement="top">
+              <Box
+                className={classes.resetBtn}
+                onClick={() => handleResets('tariffs')}
+              >
+                <FastIcon className={classes.resetIcon} iconName="reset" />
+              </Box>
+            </BootstrapTooltip>
+          )}
         </Box>
         <Box className={classes.checkboxItem}>
           <Checkbox
@@ -247,11 +268,16 @@ export default function Filters({ airlines, onFilter }) {
       <Box className={classes.tariffFilter} style={{ height: 320 }}>
         <Box className={classes.header}>
           <Box className={classes.headerText}>Авиакомпании</Box>
-          <BootstrapTooltip arrow title="Сбросить выбор" placement="top">
-            <Box className={classes.resetBtn} onClick={() => handleResets('airlines')}>
-              <FastIcon className={classes.resetIcon} iconName="reset" />
-            </Box>
-          </BootstrapTooltip>
+          {isResetStateAllowed.airlines && (
+            <BootstrapTooltip arrow title="Сбросить выбор" placement="top">
+              <Box
+                className={classes.resetBtn}
+                onClick={() => handleResets('airlines')}
+              >
+                <FastIcon className={classes.resetIcon} iconName="reset" />
+              </Box>
+            </BootstrapTooltip>
+          )}
         </Box>
         <Box className={classes.checkboxWrapper}>
           <Box className={classes.checkboxItem}>
